@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tt-qwen-image-edit"
+version = "0.1.0"
+description = "Qwen-Image-Edit-2511 + Lightning 4-step LoRA on one Tenstorrent Blackhole p100a"
+readme = "PYTHON.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+# ttnn / tt-metal is not on PyPI: it comes from the tt-metal environment this runs in.
+dependencies = [
+    "torch",
+    "numpy",
+    "safetensors",
+    "transformers",
+    "huggingface_hub",
+    "pillow",
+]
+
+[project.optional-dependencies]
+server = ["fastapi", "uvicorn", "pydantic"]
+test = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["tt_qwen_image_edit*"]

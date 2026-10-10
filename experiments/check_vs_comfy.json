@@ -1,0 +1,80 @@
+{
+  "tokens": {
+    "1:Make the sky purple ": {
+      "ids_equal": true,
+      "template_end": [
+        64,
+        64
+      ],
+      "len": 88
+    },
+    "2:\ud558\ub298\uc744 \ubcf4\ub77c\uc0c9\uc73c\ub85c \ubc14\uafd4 \uc918": {
+      "ids_equal": true,
+      "template_end": [
+        64,
+        64
+      ],
+      "len": 96
+    },
+    "3:Put the cat from Pic": {
+      "ids_equal": true,
+      "template_end": [
+        64,
+        64
+      ],
+      "len": 110
+    },
+    "1:": {
+      "ids_equal": true,
+      "template_end": [
+        64,
+        64
+      ],
+      "len": 77
+    }
+  },
+  "lm_tiny": {
+    "positions_equal": true,
+    "pcc": 0.9999999999999989,
+    "maxdiff": 2.9802322387695312e-08
+  },
+  "lm_real_2layers": {
+    "pcc": 0.999999999999492,
+    "maxdiff": 0.00012040138244628906
+  },
+  "vision": {
+    "bf16_pcc": 0.9999771616683205,
+    "patches_equal": true,
+    "grid": [
+      [
+        1,
+        22,
+        36
+      ],
+      [
+        [
+          1,
+          22,
+          36
+        ]
+      ]
+    ],
+    "pcc": 0.9999999999953361,
+    "maxdiff": 0.00016450881958007812,
+    "tokens": 198,
+    "load_s": 0.6771483421325684,
+    "run_s": 2.2143118381500244
+  },
+  "dit_1block": {
+    "pcc": 0.9999984816817075,
+    "maxdiff": 0.5169148445129395,
+    "shape": [
+      1,
+      16,
+      1,
+      27,
+      35
+    ],
+    "out_absmean": 58.49675750732422
+  }
+}

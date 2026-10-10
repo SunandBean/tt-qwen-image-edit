@@ -1,0 +1,69 @@
+schema: "5.1"
+repo: sunandbean/qwen-image-edit-2511-p100a
+name: qwen-image-edit-2511-p100a
+# This port runs the ComfyUI repackaged single files, which live in FOUR separate Apache-2.0
+# repos (DiT, the lightx2v LoRA, the text encoder, the VAE) plus a tokenizer repo. `weights:`
+# is one pointer, so it names the DiT -- the largest file and the one that identifies the
+# model -- and config.py resolves the other four through hf_hub_download on first load, with
+# the sha256 each was validated against. See the model card's Weights table.
+weights:
+  repo: Comfy-Org/Qwen-Image-Edit_ComfyUI
+  allow_patterns:
+    - split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors
+kind: tt-dit-server
+arch: blackhole
+
+image:
+  registry: hf
+
+source:
+  tt_metal: {repo: https://github.com/tenstorrent/tt-metal, ref: v0.80.0-dev20260921}
+  code:
+    # Every port in this family reaches tt-metal for `models.tt_dit.utils.matmul.get_matmul_config`.
+    # The module guards that import and falls back to None, so an under-listed allowlist builds and
+    # loads cleanly and only fails on the first matmul -- list it rather than discover that at serve.
+    - models/common
+    - models/tt_dit
+  extra_code:
+    - root: {repo: https://github.com/SunandBean/tt-qwen-image-edit, ref: v0.1.1}
+      paths: [tt_qwen_image_edit]
+  ubuntu: "22.04"
+  python: "3.12"
+
+runtime:
+  app: tt_qwen_image_edit.server:app
+  mesh_shape_env: QWEN_EDIT_MESH_SHAPE
+  packages:
+    - diffusers
+    - transformers
+    - safetensors
+    - huggingface_hub
+    - numpy
+
+serve:
+  port: 8000
+  hardware: p100a
+  mesh_device: P100
+  env:
+    ARCH_NAME: blackhole
+    TT_METAL_OPERATION_TIMEOUT_SECONDS: "600.0"
+
+verify:
+  - "import tt_qwen_image_edit.server as s; assert s.app"
+
+card:
+  description: >
+    Qwen-Image-Edit-2511 with the lightx2v 4-step Lightning LoRA, ported to one Tenstorrent
+    Blackhole p100a. The reference is not the diffusers pipeline but the ComfyUI `qwen_edit`
+    graph the same weight files run on a GPU, so results compare one to one. All weights are
+    Apache-2.0 and are never redistributed here.
+  quickstart: |
+    ### Request shape
+
+    `POST /predict` takes `{"prompt": str, "images": [b64], "width": int, "height": int,
+    "seed": int}` and returns `{"image": base64 PNG, "width", "height", "model", "license",
+    "seed", "num_steps", "reference_count", "timing_ms"}`. One to three reference images.
+    The LoRA fixes the schedule at **4 steps**; any other count is a 422.
+
+    On first load the DiT comes from the weights pointer above and the LoRA, text encoder,
+    VAE and tokenizer are fetched from their own repos into the same HF cache.
